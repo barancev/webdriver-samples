@@ -166,8 +166,8 @@ public abstract class WebElementProxy implements WebElement, WrapsElement,
   }
 
   public Point getLocationOnScreenOnceScrolledIntoView() {
-    Point locationOnScreenOnceScrolledIntoView = ((Locatable) element)
-        .getLocationOnScreenOnceScrolledIntoView();
+    Point locationOnScreenOnceScrolledIntoView =
+    		((Locatable) element).getCoordinates().inViewPort();
     return locationOnScreenOnceScrolledIntoView;
   }
 

@@ -4,20 +4,19 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.HasInputDevices;
-import org.openqa.selenium.HasTouchScreen;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keyboard;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.Mouse;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.TouchScreen;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.HasInputDevices;
+import org.openqa.selenium.interactions.HasTouchScreen;
+import org.openqa.selenium.interactions.Keyboard;
+import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.TouchScreen;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.internal.WrapsDriver;
@@ -43,7 +42,7 @@ public class AlertTolerantWebDriver implements WebDriver, JavascriptExecutor,
   private final WebDriver driver;
 
   private void logUnhandledAlert(UnhandledAlertException target) {
-    System.err.println("Unhandled alert: " + target.getAlert().getText());
+    System.err.println("Unhandled alert: " + target.getAlertText());
     target.printStackTrace();
   }
 
@@ -387,12 +386,6 @@ public class AlertTolerantWebDriver implements WebDriver, JavascriptExecutor,
       return driver;
     }
 
-    public Point getLocationOnScreenOnceScrolledIntoView() {
-      Point locationOnScreenOnceScrolledIntoView = ((Locatable) underlyingElement)
-          .getLocationOnScreenOnceScrolledIntoView();
-      return locationOnScreenOnceScrolledIntoView;
-    }
-
     public Coordinates getCoordinates() {
       Coordinates coordinates = ((Locatable) underlyingElement).getCoordinates();
       return coordinates;
@@ -578,13 +571,14 @@ public class AlertTolerantWebDriver implements WebDriver, JavascriptExecutor,
       keyboard.sendKeys(keysToSend);
     }
 
-    public void pressKey(Keys keyToPress) {
+    public void pressKey(CharSequence keyToPress) {
       keyboard.pressKey(keyToPress);
     }
 
-    public void releaseKey(Keys keyToRelease) {
+    public void releaseKey(CharSequence keyToRelease) {
       keyboard.releaseKey(keyToRelease);
     }
+
   }
 
   public class AlertTolerantMouse implements Mouse {

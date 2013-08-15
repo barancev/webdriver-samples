@@ -17,7 +17,6 @@ public class RemoteWebDriverSample {
     FirefoxProfile profile = new FirefoxProfile();
     profile.setEnableNativeEvents(true);
     firefox.setCapability("firefox_profile", profile);
-    RemoteWebDriver driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), firefox);
     simpleRun(firefox);
   }
 
