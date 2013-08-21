@@ -1,18 +1,14 @@
 package ru.st.selenium.browsers;
 
-import java.io.IOException;
-
+import org.junit.Test;
 import org.openqa.selenium.safari.SafariDriver;
 
 public class SafariSample {
 
-  public static void main(String[] args) throws IOException {
-    simpleRun();
-  }
-  
-  public static void simpleRun() {
+  @Test
+  public void simpleRun() {
     SafariDriver driver = new SafariDriver();
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 

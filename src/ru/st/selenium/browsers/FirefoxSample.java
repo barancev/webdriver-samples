@@ -3,7 +3,6 @@ package ru.st.selenium.browsers;
 import java.io.File;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpException;
@@ -13,31 +12,26 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.protocol.HttpContext;
 import org.browsermob.proxy.ProxyServer;
-import org.openqa.selenium.By;
+import org.junit.Test;
 import org.openqa.selenium.Proxy;
-import org.openqa.selenium.UnhandledAlertException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class FirefoxSample {
   
-  public static void simpleRun() {
-    RemoteWebDriver driver = new FirefoxDriver();
-    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    //driver.setLogLevel(Level.INFO);
-    driver.get("https://support.atlassian.com/secure/Dashboard.jspa");
-    driver.switchTo().frame(driver.findElement(By.id("gadget-0")));
-    driver.findElement(By.name("os_username")).sendKeys("demo");
-    driver.findElement(By.name("os_password")).sendKeys("demo");
-    driver.findElement(By.name("login")).click();
+  @Test
+  public void simpleRun() {
+    WebDriver driver = new FirefoxDriver();
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 
-  public static void runThroughProxy() throws Exception {
+  @Test
+  public void runThroughProxy() throws Exception {
     ProxyServer pserver = new ProxyServer(9999);
     pserver.start();
     pserver.addRequestInterceptor(new HttpRequestInterceptor() {
@@ -65,124 +59,120 @@ public class FirefoxSample {
     pserver.stop();
   } 
 
-  public static void runWithCustomProfile() {
-    FirefoxProfile profile = new FirefoxProfile();
-    profile.setPreference("intl.accept_languages", "ru, en-us, en");
-
-    profile.setPreference("browser.download.dir", "C:/TEMP");
-    profile.setPreference("browser.download.folderList", 2);
-    
-    profile.setAssumeUntrustedCertificateIssuer(false);
-    profile.setAcceptUntrustedCertificates(true);
-    //profile.setUnexpectedAlertBehaviour(UnexpectedAlertBehaviour.IGNORE);
-    
-    FirefoxDriver driver = new FirefoxDriver(profile);
-    driver.get("http://localhost/test/alerts.html");
-    driver.findElement(By.id("prompt-with-default")).click();
-    try {
-      System.out.println(driver.findElement(By.id("text")).getText());
-    } catch (UnhandledAlertException ex) {
-      ex.printStackTrace();
-    }
-    System.out.println(driver.findElement(By.id("text")).getText());
-    driver.quit();
-  }
-
-  public static void runThroughProxy2() {
+  @Test
+  public void runThroughProxy2() {
     Proxy proxy = new Proxy();
     proxy.setHttpProxy("localhost:8888");
     FirefoxProfile profile = new FirefoxProfile();
     profile.setProxyPreferences(proxy);
 
     FirefoxDriver driver = new FirefoxDriver(profile);
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 
-  public static void runWithSynthesizedEvents() throws Exception {
+  @Test
+  public void runWithCustomProfile() {
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.setPreference("intl.accept_languages", "en-us, en");
+
+    profile.setPreference("browser.download.dir", "C:/TEMP");
+    profile.setPreference("browser.download.folderList", 2);
+    
+    profile.setAssumeUntrustedCertificateIssuer(false);
+    profile.setAcceptUntrustedCertificates(true);
+    
+    FirefoxDriver driver = new FirefoxDriver(profile);
+    driver.get("http://ci.seleniumhq.org:8080/");
+    System.out.println(driver.getTitle());
+    driver.quit();
+  }
+
+  @Test
+  public void runWithSynthesizedEvents() throws Exception {
     FirefoxProfile profile = new FirefoxProfile();
 
     // profile.setEnableNativeEvents(true); // default for Windows
     profile.setEnableNativeEvents(false); // default for Linux
+    
+    DesiredCapabilities caps = new DesiredCapabilities();
+    caps.setCapability("nativeEvents", true);
 
-    FirefoxDriver driver = new FirefoxDriver(profile);
-    driver.get("http://jqueryui.com/demos/accordion/#mouseover");
-    List<WebElement> elements = driver.findElements(By.className("ui-accordion-header"));
-    System.out.println(elements);
-    for (WebElement el : elements) {
-      new Actions(driver).moveToElement(el).perform();
-      Thread.sleep(1000);
-    }
+    FirefoxDriver driver = new FirefoxDriver(caps);
+    driver.get("http://selenium2.ru");
+    System.out.println(driver.getCapabilities());
     driver.quit();
   }
 
-  public static void runWithExtensions() throws IOException {
+  @Test
+  public void runWithExtensions() throws IOException {
     FirefoxProfile profile = new FirefoxProfile();
 
-    profile.addExtension(new File("C:/Users/alexei/Downloads/firebug-1.10.0a7.xpi"));
+    profile.addExtension(new File("C:/Users/alexei/Downloads/firebug-1.11.4-fx.xpi"));
     profile.setPreference("extensions.firebug.currentVersion", "9.9.9");
     profile.setPreference("extensions.firebug.allPagesActivation", "on");
     profile.setPreference("extensions.firebug.defaultPanelName", "net");
     profile.setPreference("extensions.firebug.net.enableSites", true);
 
     FirefoxDriver driver = new FirefoxDriver(profile);
-    driver.get("http://localhost/");
-    driver.quit();
+    driver.get("http://selenium2.ru/");
+    //driver.quit();
   }
 
-  public static void runWithExistingProfile() {
+  @Test
+  public void runWithExistingProfile() {
     FirefoxProfile profile = new FirefoxProfile(
         new File("C:/Users/alexei/AppData/Roaming/Mozilla/Firefox/Profiles/lzmkqeur.selenium"));
 
-    profile.setPreference("browser.download.dir", "C:/TEMP");
-    profile.setPreference("browser.download.folderList", 2);
-
     FirefoxDriver driver = new FirefoxDriver(profile);
-    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 
-  public static void runFromNonstandardLocation() {
+  @Test
+  public void runFromNonstandardLocation() {
     FirefoxBinary binary = new FirefoxBinary(
-        new File("C:/Program Files/Mozilla Firefox/firefox.exe"));
+        new File("C:/Program Files (x86)/Aurora/firefox.exe"));
 
     FirefoxProfile profile = new FirefoxProfile();
 
     FirefoxDriver driver = new FirefoxDriver(binary, profile);
-    driver.get("http://localhost/");
-    driver.quit();
+    driver.get("http://selenium2.ru/");
+    //driver.quit();
   }
 
-  public static void runWithLongerTimeout() {
+  @Test
+  public void runWithLongerTimeout() {
     FirefoxBinary binary = new FirefoxBinary();
     binary.setTimeout(90000); // default is 45000
 
     FirefoxProfile profile = new FirefoxProfile();
 
     FirefoxDriver driver = new FirefoxDriver(binary, profile);
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 
-  public static void runWithCustomEnvironment() {
+  @Test
+  public void runWithCustomEnvironment() {
     FirefoxBinary binary = new FirefoxBinary();
     binary.setEnvironmentProperty("DISPLAY", ":1");
 
     FirefoxProfile profile = new FirefoxProfile();
 
     FirefoxDriver driver = new FirefoxDriver(binary, profile);
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
   }
 
-  public static void runAndGetBrowserErrorLog() throws IOException {
+  @Test
+  public void runAndGetBrowserErrorLog() throws IOException {
     FirefoxBinary binary = new FirefoxBinary();
 
     FirefoxProfile profile = new FirefoxProfile();
 
     FirefoxDriver driver = new FirefoxDriver(binary, profile);
-    driver.get("http://localhost/");
+    driver.get("http://selenium2.ru/");
     driver.quit();
 
     System.out.println(binary.getConsoleOutput());
